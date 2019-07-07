@@ -44,6 +44,7 @@ router.post('/api/InsertarSorteo', db.InsertarSorteo);
 
 router.put('/api/AcutalizarDef/:iddefensa', db.AcutalizarDef);
 router.put('/api/actualizarNota/:iddefensa', db.actualizarNota);
+router.put('/api/resetCasosxArea/:idarea', db.resetCasosxArea);
 
 
 module.exports = router;
