@@ -135,13 +135,14 @@ function obtenerEstudiantes(req, res, next) {
 
 function obtenerAprobados(req, res, next) {
     let filtro = req.params.filtro
-    db.any(`select casos.idcaso,defensas.iddefensa,personas.nombre as Nombres,personas.apaterno,personas.amaterno,estudiantes.registro,carreras.nombre as carrera,
-    areas.nombre as area,casos.nombre as caso
-        from defensas,personas,estudiantes,carreras,areas,casos,sorteos
-        where personas.idpersona = estudiantes.idpersona and personas.idcarrera = carreras.idcarrera and areas.idcarrera = carreras.idcarrera
-        and casos.idarea = areas.idarea and sorteos.idsorteo = defensas.idsorteo and sorteos.idpersona = personas.idpersona and casos.idcaso = sorteos.idcaso
-        and carreras.idcarrera = ${filtro} and defensas.nota = 'A' and not EXISTS (
-    select 1 from sorteos where sorteos.idpersona = personas.idpersona and sorteos.estado = 'EXTERNA')`)
+    db.any(`select casos.idcaso,personas.idpersona,personas.nombre as Nombres, apaterno,amaterno,registro,carreras.nombre as Carrera,casos.nombre as caso,areas.nombre as area
+    from defensas,personas,estudiantes,carreras,areas,casos,sorteos
+    where personas.idpersona = estudiantes.idpersona and personas.idcarrera = carreras.idcarrera and areas.idcarrera = carreras.idcarrera
+    and casos.idarea = areas.idarea and sorteos.idsorteo = defensas.idsorteo and sorteos.idpersona = personas.idpersona and casos.idcaso = sorteos.idcaso
+    and carreras.idcarrera = ${filtro} and not EXISTS (
+    select 1 from sorteos where sorteos.idpersona = personas.idpersona and sorteos.estado = 'EXTERNA')
+    and EXISTS (
+    select 1 from sorteos, defensas where sorteos.idpersona = personas.idpersona and defensas.idsorteo = sorteos.idsorteo and defensas.nota = 'A')`)
         .then(function (data) {
             res.status(200).json({
                 status: 'success',
